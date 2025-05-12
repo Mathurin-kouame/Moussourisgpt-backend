@@ -35,7 +35,7 @@ export class UsersService {
             if (verifyEmail) {
                 return res.status(HttpStatus.CONFLICT).json({
                     error: true,
-                    message:" votre email existe déjà"
+                    message:"votre email existe déjà"
                 })
             }
 
@@ -51,6 +51,7 @@ export class UsersService {
             }
 
         // if (verifyUser?.email  === userData.email || verifyUser?.password){}
+
             //code copier
                 const saltOrRounds = 10;
                 console.log('send password:', userData.password)
@@ -70,12 +71,11 @@ export class UsersService {
                     })
                     
                 }
-                // return {
-                //     error: false,
-                //     message: " Données enregistrées avec succès !",
-                //     data: dataSave
-                // }
-                return res.status(HttpStatus.OK)
+                return res.status(HttpStatus.OK).json({
+                    error: false,
+                    message:"Données enregistrés avec sucès!",
+                    data: dataSave
+                })
 
         } catch (error) {
             console.log(error);
@@ -89,18 +89,29 @@ export class UsersService {
 
 //get information user
     async getAllUser(){
-        const dataUsers = await this.userRepository.find();
-        const countUser = await this.userRepository.count();
-
+        // const dataUsers = await this.userRepository.find();
+        // const countUser = await this.userRepository.count();
+        try {
+        const [dataUsers, countUser] = await this.userRepository.findAndCount();
+            
         return {
             error: false,
             message: " Données enregistrées avec succès !",
             data: dataUsers,
             nbUsers: countUser
+
+
         }
+        } catch (error) {
+            console.error("erreur l'enregistrement non effectué :", error)
+        }
+        
     }
 
     async updateProfile(userData: UpdateUserDto){
+
+        try {
+            
         const dataUser = await this.userRepository.findBy({id: userData.idUsers});
         //const dataUser = await this.userRepository.findOneBy({id: userData.idUsers});
     
@@ -108,6 +119,14 @@ export class UsersService {
         //console.log(dataUser[0]);
         //dataUser?:fullName = userData.fullname
 
+        //verification de user
+        if (!dataUser) {
+            return {
+                error: true,
+                message: "l'utilisateur n'exite pas"
+            }
+           }
+    
         dataUser[0].fullName = userData.fullname ?? dataUser[0].fullName;
         dataUser[0].pseudo = userData.pseudo ?? dataUser[0].pseudo;
         dataUser[0].email = userData.email ?? dataUser[0].email;
@@ -120,6 +139,18 @@ export class UsersService {
             message: "utilisateur mise à jour avec succès!",
             data: saveData
         }
+
+        } catch (error) {
+            console.error('Une erreur est intervenu lors de la mise à jour', error)
+            return {
+                 error: true,
+                 message: "Une erreur du serveur lors de la mise jour",
+                 details: error.message
+            }
+        
+        }
+        
+        
     }
 
     async deleleProfile(idUsers: string){
