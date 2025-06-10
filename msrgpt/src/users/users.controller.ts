@@ -2,16 +2,18 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Res } from '@nestjs/co
 import { CreateUserDto } from './Dto/create_user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './Dto/update-user.dto';
-import { Response } from "express";
+import { Response } from 'express';
+
+
 
 @Controller('users')
 export class UsersController {
+
      constructor(private usersService: UsersService){}
-
-
+     
     @Post('create/user')
     createUser(@Body() user: CreateUserDto, @Res() res: Response){
-       return this.usersService.createUser(user, res);
+      return this.usersService.createUser(user, res);
     }
 
     @Get('all')
@@ -20,16 +22,16 @@ export class UsersController {
     }
 
     @Put('update/profile')
-    updateProfile(@Body() userData: UpdateUserDto){
-      console.log(userData);
-       return this.usersService.updateProfile(userData);
+    updateProfile(@Body() userData: UpdateUserDto, @Res() res: Response){
+      console.log(userData)
+       return this.usersService.updateProfile(userData, res);
     }
 
     @Delete('delete/profile/:id')
-    deleteProfile(@Param('id') idUsers : string) {
+    deleteProfile(@Param('id') idUsers: string) {
       console.log(idUsers)
 
-      return this.usersService.deleleProfile(idUsers);
+      return this.usersService.deleteProfile(idUsers);
     }
 
 

@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt'; // security
 import { User } from 'src/users/user.entity';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { AppService } from 'src/app.service';
 
 
 @Injectable()
@@ -12,27 +13,28 @@ export class AuthService {
  
     constructor(@InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        private jwtService: JwtService){}
+        private jwtService: JwtService,
+        private appService: AppService){}
         
 //generate of code OTP
- generateOtp(length: number =6):string{
+ generateOtp(length: number = 6):string{
     let codeOtp ="";
 
     for (let i = 0; i<length; i++) {
-       codeOtp += Math.floor(Math.random()*10)
+       codeOtp += Math.floor(Math.random() * 10)
         
     }
   return codeOtp;
 }
 
-async verifyOTP(codeOTP:string, email: string, res: Response){
+async verifyOTP(codeOTP: string, email: string, res: Response){
     
     if (!email.endsWith('@gmail.com')) {
         console.log(email);
         return res.status(HttpStatus.BAD_REQUEST).json({
             error:true,
             message: "uniquement des @gmails"
-        })
+        });
     }
 
     try {
@@ -42,14 +44,14 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
             return res.status(HttpStatus.BAD_REQUEST).json({
                 error:true,
                 message: "ce email que vous avez fourni est invalide !"
-            })
+            });
         }
 
         if (userVerify.codeOTP !== codeOTP) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 error: true,
                 message: "le code OTP est invalide !"
-            })
+            });
         }
 
         const updateData = this.userRepository.update(userVerify.id, {
@@ -61,7 +63,7 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
         if (!updateData) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 error: true,
-                message: "une erreur est souvenue !"
+                message: "une erreur est survenue !"
             })
         }
 
@@ -80,40 +82,40 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
 }
 
 //create new user
-        async createUser(fullName:string, pseudo: string, password:string, email: string, res:Response){
+        async createUser(fullName:string, pseudo: string, email:string, password: string, res:Response){
 
             if (!email.endsWith('@gmail.com')) {
                 console.log(email);
             return res.status(HttpStatus.BAD_REQUEST).json({
                 error:true,
                 message: "uniquement des emails de gmail"
-        })
-    }
+                })
+            }
 
             try {
+
+                const verifyEmail = await this.userRepository.findOne({where: {email: email}});
+                console.log("email verify: ", verifyEmail)
+
+                if (verifyEmail) {
+                    return res.status(HttpStatus.CONFLICT).json({
+                        error: true,
+                        message: "l'email existe déjà"
+                    })
+
+                }
+
                 const verifyUser = await this.userRepository.findOne({where: {fullName: fullName}});
                 console.log("user verify:", verifyUser)
 
                 if (verifyUser) {
                     return res.status(HttpStatus.CONFLICT).json({
                         error: true,
-                        massege: "user existe déjà"
+                        message: "user existe déjà"
                     })
                 }
 
-                const verifyEmail = await this.userRepository.findOne({where: {email}});
-
-                console.log("email verify: ", verifyEmail)
-
-
-
-                if (verifyEmail) {
-                    return res.status(HttpStatus.CONFLICT).json({
-                        error: true,
-                        message: "l' email existe déjà"
-                    })
-
-                }
+                
 
                 const verifyPseudo = await this.userRepository.findOne({where: {pseudo}});
 
@@ -136,7 +138,7 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
 //call generateOtp
                 const codeOTP = this.generateOtp();
 
-                const saveData = this.userRepository.create({fullName, email, password, codeOTP });
+                const saveData = this.userRepository.create({fullName, pseudo, email, password, codeOTP });
                 const saveUser = this.userRepository.save(saveData);
 
                 if (!saveUser) {
@@ -145,6 +147,8 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
                         message: "Enregistrement non effectué !"
                     })
                 }
+
+                await this.appService.sendMail(email, codeOTP);
 
                 return res.status(HttpStatus.CREATED).json({
                     error: false,
@@ -155,20 +159,20 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
                 console.log(error);
                 return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                     error : true,
-                    message: "Uniquement des emails gmails"
+                    message: `Erreur survenu ${error.message}`
                 })
             }
         }
                     //login
 
-        async login(email: string, password:string, res:Response){
+        async connexionUser(email: string, password:string, res:Response){
             
             if (!email.endsWith('@gmail.com')) {
 
                 console.log(email)
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     error: true,
-                    message: "Nous acceptions uniquement des mails gmail"
+                    message: "Nous acceptons uniquement des mails Gmail"
                 });
             };
 
@@ -192,7 +196,7 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
                 }
 
                 //token
-                const payload = {sub:verifyEmail.id, username: verifyEmail.pseudo};
+                const payload = {sub: verifyEmail.id, username: verifyEmail.pseudo};
                 const token = await this.jwtService.signAsync(payload);
 
                 return res.status(HttpStatus.OK).json({
@@ -200,6 +204,7 @@ async verifyOTP(codeOTP:string, email: string, res: Response){
                     message: "connexion reussie !",
                     token: token
                 })
+                
             } catch (error) {
                 console.log(error);
                 return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

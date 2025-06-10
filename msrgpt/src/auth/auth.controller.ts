@@ -1,8 +1,8 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/users/Dto/create_user.dto';
-import { LoginDto } from './Dto/login.dto';
 import { Response } from 'express';
+import { CreateUserDto } from 'src/users/Dto/create_user.dto';
+import { ConnexionUserDto } from './connexion-user.dto';
 
 
 @Controller('auth')
@@ -10,16 +10,14 @@ export class AuthController {
 
     constructor(private authService: AuthService){}
 
-    @Post('signup')
+    @Post('inscription')
     createUser(@Body() userData: CreateUserDto, @Res() res: Response){
-
-        return this.authService.createUser(userData.fullName, userData.pseudo, 
-            userData.email, userData.pseudo, res);
+        return this.authService.createUser(userData.fullName, userData.pseudo, userData.email, userData.password, res);
     }
 
-    @Post('login')
-    login(@Body() userData: LoginDto, @Res() res: Response ){
-        return this.authService.login(userData.email, userData.password, res);
+    @Post('connexion')
+    loginUser(@Body() userData: ConnexionUserDto, @Res() res: Response ){
+        return this.authService.connexionUser(userData.email, userData.password, res);
     }
 
     @Post('otp/verify')

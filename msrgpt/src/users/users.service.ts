@@ -52,9 +52,10 @@ export class UsersService {
 
         // if (verifyUser?.email  === userData.email || verifyUser?.password){}
 
-            //code copier
+            //harché de mon de password
                 const saltOrRounds = 10;
-                console.log('send password:', userData.password)
+                console.log('send password:', userData.password);
+
                 const password = userData.password;
                 const hash = await bcrypt.hash(password, saltOrRounds);
                 userData.password = hash;
@@ -87,46 +88,30 @@ export class UsersService {
 
     }
 
-//get information user
     async getAllUser(){
-        // const dataUsers = await this.userRepository.find();
-        // const countUser = await this.userRepository.count();
-        try {
-        const [dataUsers, countUser] = await this.userRepository.findAndCount();
-            
+
+        const dataUsers = await this.userRepository.find();
+        const countUser = await this.userRepository.count();
+
         return {
-            error: false,
-            message: " Données enregistrées avec succès !",
-            data: dataUsers,
-            nbUsers: countUser
-
-
-        }
-        } catch (error) {
-            console.error("erreur l'enregistrement non effectué :", error)
-        }
-        
+                error: false,
+                message: "Valeur enregistrée avec succès",
+                data: dataUsers,
+                nbUsers: countUser
+            }
     }
 
-    async updateProfile(userData: UpdateUserDto){
+    async updateProfile(userData: UpdateUserDto, res: Response){
 
-        try {
-            
         const dataUser = await this.userRepository.findBy({id: userData.idUsers});
         //const dataUser = await this.userRepository.findOneBy({id: userData.idUsers});
-    
+        
+        
         console.log(dataUser);
         //console.log(dataUser[0]);
         //dataUser?:fullName = userData.fullname
 
         //verification de user
-        if (!dataUser) {
-            return {
-                error: true,
-                message: "l'utilisateur n'exite pas"
-            }
-           }
-    
         dataUser[0].fullName = userData.fullname ?? dataUser[0].fullName;
         dataUser[0].pseudo = userData.pseudo ?? dataUser[0].pseudo;
         dataUser[0].email = userData.email ?? dataUser[0].email;
@@ -134,34 +119,23 @@ export class UsersService {
 
         const saveData = await this.userRepository.save(dataUser[0]);
 
-        return {
+        return res.status(HttpStatus.OK).json({   
             error:false,
             message: "utilisateur mise à jour avec succès!",
             data: saveData
-        }
-
-        } catch (error) {
-            console.error('Une erreur est intervenu lors de la mise à jour', error)
-            return {
-                 error: true,
-                 message: "Une erreur du serveur lors de la mise jour",
-                 details: error.message
-            }
-        
-        }
-        
-        
+    }) 
+          
     }
 
-    async deleleProfile(idUsers: string){
-           const deleleProfile = await this.userRepository.delete({id: idUsers});
+    
+    async deleteProfile(idUsers: string){
+        const deleteProfile = await this.userRepository.delete({id: idUsers});
 
-           console.log("user supprimé:", deleleProfile);
-
-           return {
-            error : false,
-            message: " user supprimé avec succès!"
-           }
+        console.log("Utilisateur supprimé: ", deleteProfile);
+        return {
+            error: false,
+            message: "Utilisateurs supprimé avec succes"
+        }
     }
     
 }

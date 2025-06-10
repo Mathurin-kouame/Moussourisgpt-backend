@@ -1,5 +1,7 @@
 
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Prompt } from 'src/prompts/prompt.entity';
+import { PromptUsage } from 'src/prompts/prompt_usage.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
 
 @Entity()
 export class User {
@@ -9,20 +11,20 @@ export class User {
   @Column()
   fullName: string;
 
-  @Column({type: 'varchar', length: 10, unique: true})
+  @Column({type: 'varchar',length: 10,unique: true})
   pseudo: string;
 
-  @Column({ unique: true})
+  @Column({unique: true})
   email: string;
 
   @Column()
   password: string;
 
-  @Column({ nullable: true })
+  @Column({nullable: true})
   telNumber: string;
 
   @Column({default:0})
-   countPromptDay:number;
+   countPromptDay: number;
 
    @Column({nullable:true})
    lastPromptDate: Date;
@@ -34,12 +36,19 @@ export class User {
    @Column({nullable:true})
    codeOTP : string;
    
-  @Column({ type: 'datetime', default: ()=> 'CURRENT_TIMESTAMP'})
+  @Column({type: 'datetime',default: ()=> 'CURRENT_TIMESTAMP'})
   created_at: string;
 
   @Column({ 
     default: true 
   })
   isActive: boolean;
+
+  @OneToMany(() => Prompt, (prompt) => prompt.user)
+    prompts: Prompt[]
+
+  
+   @OneToMany(() => PromptUsage, (PromptUsage) => PromptUsage.user)
+   prompt_usage: PromptUsage[];
   
 }

@@ -12,6 +12,14 @@ import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { OpeniaController } from './openai/openai.controller';
+import { OpenaiService } from './openai/openai.service';
+import { Prompt } from './prompts/prompt.entity';
+import { PromptUsage } from './prompts/prompt_usage.entity';
+import OpenAI from 'openai';
+import { OpeniaModule } from './openai/openai.module';
+
 
 
 @Module({
@@ -24,12 +32,24 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Joueur],
+      entities: [User,Prompt,PromptUsage,Joueur],
       synchronize: true,
     }),
+    MailerModule.forRoot({transport: {
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      },
+    }),
+
     JoueursModule,
     UsersModule,
     AuthModule,
+    OpeniaModule,
   ],
   controllers: [AppController, JoueursController],
   providers: [AppService, JoueursService],
