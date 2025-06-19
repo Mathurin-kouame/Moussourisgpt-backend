@@ -8,8 +8,12 @@ import { UpdateUserDto } from './Dto/update-user.dto';
 import { Response } from "express";
 
 
+
 @Injectable()
 export class UsersService {
+    findById(id: string) {
+      throw new Error('Method not implemented.');
+    }
 
     constructor(@InjectRepository(User)
     private  readonly userRepository: Repository<User>){}
@@ -88,17 +92,34 @@ export class UsersService {
 
     }
 
-    async getAllUser(){
+    async getAllUser(res: Response){
 
         const dataUsers = await this.userRepository.find();
         const countUser = await this.userRepository.count();
 
-        return {
+        return res.status(HttpStatus.OK).json({
                 error: false,
                 message: "Valeur enregistrée avec succès",
                 data: dataUsers,
                 nbUsers: countUser
-            }
+            })
+    }
+
+    async UserInfo(userId: string,  res: Response){
+        const dataUsers = await this.userRepository.findOne({where: {id: userId}});
+
+        if (!dataUsers) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                error: true,
+                message: "information non trouvée!"
+            })
+        }
+
+        return res.status(HttpStatus.OK).json({
+            error: false,
+            message: "Données  trouvées avec succès",
+            data: dataUsers
+        })
     }
 
     async updateProfile(userData: UpdateUserDto, res: Response){

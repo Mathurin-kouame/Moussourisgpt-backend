@@ -34,21 +34,19 @@ export class User {
    emailVerify: boolean;
 
    @Column({nullable:true})
-   codeOTP : string;
+   codeOtp : string;
    
   @Column({type: 'datetime',default: ()=> 'CURRENT_TIMESTAMP'})
   created_at: string;
 
-  @Column({ 
-    default: true 
-  })
+  @Column({ default:false})
   isActive: boolean;
 
   @OneToMany(() => Prompt, (prompt) => prompt.user)
-    prompts: Prompt[]
+    prompt: Prompt[]
 
   
-   @OneToMany(() => PromptUsage, (PromptUsage) => PromptUsage.user)
+   @OneToMany(() => PromptUsage, (prompt_usage) => prompt_usage.user)
    prompt_usage: PromptUsage[];
   
 }

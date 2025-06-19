@@ -1,5 +1,5 @@
 import { User } from "src/users/user.entity";
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Prompt {
@@ -12,14 +12,10 @@ export class Prompt {
     @Column({nullable:true})
     reponse: string;
 
-    
-
     @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
     created_at: string;
     
-    @ManyToMany(()=> User, (user) =>user.prompts)
-    user:User
-
+    @ManyToOne(()=> User, (user) =>user.prompt)
+    user: User;
     
-
 }

@@ -1,10 +1,11 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class DatapromptDto {
+export class DatapromptDto{
     @IsNotEmpty()
     @IsString()
-    options:String;
+    option:String;
 
+    @IsNotEmpty()
     @IsString()
     prompt:string;
 }

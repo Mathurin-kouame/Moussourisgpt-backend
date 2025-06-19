@@ -12,18 +12,18 @@ export class AuthController {
 
     @Post('inscription')
     createUser(@Body() userData: CreateUserDto, @Res() res: Response){
-        return this.authService.createUser(userData.fullName, userData.pseudo, userData.email, userData.password, res);
+        return this.authService.createUser(userData.fullName, userData.pseudo, userData.password, userData.email, res);
     }
 
     @Post('connexion')
-    loginUser(@Body() userData: ConnexionUserDto, @Res() res: Response ){
+    connexionUser(@Body() userData: ConnexionUserDto, @Res() res: Response ){
         return this.authService.connexionUser(userData.email, userData.password, res);
     }
 
     @Post('otp/verify')
     otpVerify(@Body() dataUser: string, @Res() res:Response){
         console.log("email", dataUser["email"])
-        return this.authService.verifyOTP(dataUser["codeOTP"], dataUser["email"],res);
+        return this.authService.verifyOTP(dataUser["codeOtp"], dataUser["email"],res);
     }
     
 }

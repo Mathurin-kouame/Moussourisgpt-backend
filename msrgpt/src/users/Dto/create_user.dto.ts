@@ -7,12 +7,13 @@ export class CreateUserDto{
     fullName: string;
 
     @IsNotEmpty()
+    @IsEmail()
+    email: string;
+    
+    @IsNotEmpty()
     @IsString()
     pseudo: string;
     
-    @IsNotEmpty()
-     @IsEmail()
-    email: string;
     
     @IsNotEmpty()
     @IsString()

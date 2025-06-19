@@ -3,10 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
-import { JoueursController } from './joueurs/joueurs.controller';
-import { JoueursService } from './joueurs/joueurs.service';
-import { JoueursModule } from './joueurs/joueurs.module';
-import { Joueur } from './joueurs/joueur.entity';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
@@ -32,9 +28,12 @@ import { OpeniaModule } from './openai/openai.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User,Prompt,PromptUsage,Joueur],
+      entities: [User,Prompt,PromptUsage],
       synchronize: true,
     }),
+    
+    UsersModule,
+    AuthModule,
     MailerModule.forRoot({transport: {
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
@@ -46,12 +45,9 @@ import { OpeniaModule } from './openai/openai.module';
       },
     }),
 
-    JoueursModule,
-    UsersModule,
-    AuthModule,
     OpeniaModule,
   ],
-  controllers: [AppController, JoueursController],
-  providers: [AppService, JoueursService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

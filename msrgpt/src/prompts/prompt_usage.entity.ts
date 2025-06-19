@@ -6,13 +6,16 @@ export class PromptUsage {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(() => User, (user) => user.prompt_usage)
+    @Column({type: 'date'})
+    date: string;
+
+    @Column({type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
+    created_at: string;
+
+  @Column({default:0})
+    comptage_prompt: number;
+
+    @ManyToOne(() => User, (user) => user.prompt_usage,{onDelete:"CASCADE"})
     user: User;
     
-    @Column({default:0})
-    comptage_prompt:number;
-
-    @Column({type: 'datetime', default: () =>'CURRENT_TIMESTAMP'})
-    created_at:string
-
 }
