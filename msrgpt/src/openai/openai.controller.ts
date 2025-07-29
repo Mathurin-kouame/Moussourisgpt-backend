@@ -54,7 +54,7 @@ export class OpeniaController {
 
 
             const fullPrompt = `Option sélectionnée : ${DataPromptOption}. Action : ${dataPrompt.prompt}.\nRetourne uniquement la commande à exécuter sans aucun commentaire ni explication.`;
-            return this.openaiService.sendPrompt(fullPrompt, req.user.userId, res)
+            return this.openaiService.sendPrompt(fullPrompt, req.user.userId)
         
             
         } catch (error) {

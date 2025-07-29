@@ -95,7 +95,7 @@ export class AuthService {
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     error: false,
                     message:"Entrer Uniquement des mails gmail !"
-                })
+                });
 
             }
 
@@ -115,20 +115,20 @@ export class AuthService {
 
                     return res.status(HttpStatus.CONFLICT).json({
                         error: true,
-                        message: " Pseudo dejà utilisé"
+                        message: " Pseudo dejà utilisé" 
                        })
                 }
 
                 const saltOrRounds = 10;
                 const passwords = password;
-                const hash = await bcrypt.hash(passwords, saltOrRounds,);
+                const hash = await bcrypt.hash(passwords, saltOrRounds);
 
                 const codeOtp = this.generateOtp();
-                const dataSave =  this.userRepository.create({fullName,email,pseudo,password: hash, codeOtp}) 
+                const dataSave =  this.userRepository.create({fullName,email,pseudo,password: hash, codeOtp});
                
+                const saveUser = this.userRepository.save(dataSave);  // await ajouter 
 
-
-                const saveUser = this.userRepository.save(dataSave)    
+                await this.appService.sendMail(email, codeOtp);
 
                 if(!saveUser){
                     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -136,9 +136,7 @@ export class AuthService {
                         message: "Enregistrement non effectué"
                     })
                 }
-                  
-                 await this.appService.sendMail(email, codeOtp);
-
+                
                 return res.status(HttpStatus.CREATED).json({
                     error:false,
                     message:'Compte crée avec succès',
@@ -164,7 +162,6 @@ export class AuthService {
                     error: false,
                     message: "Entrer Uniquement des mails gmail !"
                 })
-
             }
 
             try {
@@ -177,7 +174,6 @@ export class AuthService {
                      message: " Compte inexistant "
                     })
                  }
-
 
                     const isMatch = await bcrypt.compare(password, verifyEmail.password);
 

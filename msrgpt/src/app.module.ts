@@ -31,9 +31,6 @@ import { OpeniaModule } from './openai/openai.module';
       entities: [User,Prompt,PromptUsage],
       synchronize: true,
     }),
-    
-    UsersModule,
-    AuthModule,
     MailerModule.forRoot({transport: {
         host: process.env.EMAIL_HOST,
         port: process.env.EMAIL_PORT,
@@ -44,6 +41,9 @@ import { OpeniaModule } from './openai/openai.module';
         },
       },
     }),
+    UsersModule,
+    AuthModule,
+    
 
     OpeniaModule,
   ],
